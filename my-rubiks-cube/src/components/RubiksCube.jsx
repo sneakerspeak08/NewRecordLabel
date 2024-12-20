@@ -423,39 +423,40 @@ const RubiksCube = () => {
         style={{ pointerEvents: "auto" }}
       />
 
-      {/* Buttons */}
-      <div
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-50 flex space-x-4 bg-black bg-opacity-80 p-4 rounded-lg shadow-lg"
-        style={{
-          pointerEvents: "auto",
-          zIndex: 1000,
-        }}
-      >
-        <button
-          className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300"
-          onClick={() => rotateCube(new THREE.Vector3(1, 0, 0), 1, Math.PI / 2, "Rotate Right")}
-        >
-          Rotate Right
-        </button>
-        <button
-          className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300"
-          onClick={() => rotateCube(new THREE.Vector3(1, 0, 0), -1, -Math.PI / 2, "Rotate Left")}
-        >
-          Rotate Left
-        </button>
-        <button
-          className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300"
-          onClick={() => rotateCube(new THREE.Vector3(0, 1, 0), 1, Math.PI / 2, "Rotate Up")}
-        >
-          Rotate Up
-        </button>
-        <button
-          className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300"
-          onClick={() => rotateCube(new THREE.Vector3(0, 1, 0), -1, -Math.PI / 2, "Rotate Down")}
-        >
-          Rotate Down
-        </button>
-      </div>
+{/* Buttons */}
+<div
+  className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-50 flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 bg-black bg-opacity-80 p-4 rounded-lg shadow-lg w-full sm:w-auto"
+  style={{
+    pointerEvents: "auto",
+    zIndex: 1000,
+  }}
+>
+  <button
+    className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300 text-sm sm:text-base w-full sm:w-auto"
+    onClick={() => rotateCube(new THREE.Vector3(1, 0, 0), 1, Math.PI / 2, "Rotate Right")}
+  >
+    Rotate Right
+  </button>
+  <button
+    className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300 text-sm sm:text-base w-full sm:w-auto"
+    onClick={() => rotateCube(new THREE.Vector3(1, 0, 0), -1, -Math.PI / 2, "Rotate Left")}
+  >
+    Rotate Left
+  </button>
+  <button
+    className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300 text-sm sm:text-base w-full sm:w-auto"
+    onClick={() => rotateCube(new THREE.Vector3(0, 1, 0), 1, Math.PI / 2, "Rotate Up")}
+  >
+    Rotate Up
+  </button>
+  <button
+    className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300 text-sm sm:text-base w-full sm:w-auto"
+    onClick={() => rotateCube(new THREE.Vector3(0, 1, 0), -1, -Math.PI / 2, "Rotate Down")}
+  >
+    Rotate Down
+  </button>
+</div>
+
     </div>
   );
 };
