@@ -33,3 +33,40 @@
     opacity: 0.5;
   }
 }
+
+/* Button Layout Adjustments */
+@media (max-width: 600px) {
+  .buttons-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px; /* Adds space between buttons */
+  }
+
+  .buttons-container button {
+    width: 80%; /* Makes buttons smaller for mobile */
+  }
+}
+
+/* Adjust text positioning on the preview page */
+@media (max-width: 600px) {
+  .neon-text {
+    font-size: 2rem; /* Smaller font size for mobile */
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .preview-text-container {
+    font-size: 1.5rem; /* Adjust font size */
+    text-align: center;
+  }
+}
+
+/* Make the Rubik's cube container responsive */
+@media (max-width: 600px) {
+  .rubiks-cube-container {
+    width: 90vw; /* Use viewport width */
+    height: auto;
+  }
+}
+
