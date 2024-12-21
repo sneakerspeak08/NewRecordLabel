@@ -4,6 +4,33 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { useNavigate } from 'react-router-dom';
 import MatrixBackground from "./MatrixBackground";
 
+
+// Add the texture creation function here
+const createKatakanaTexture = (size = 256) => {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+
+  const context = canvas.getContext('2d');
+  
+  // Clear background
+  context.clearRect(0, 0, size, size);
+
+  const katakana = "ァアィイゥウェエォオカガキギクグケゲコゴサザシジスズセゼソゾタダチヂッツヅテデトドナニヌネノハバパヒビピフブプヘベペホボポマミムメモャヤュユョヨラリルレロワヲンヴヵヶ";
+  const randomChar = katakana[Math.floor(Math.random() * katakana.length)];
+  
+  // Set subtle white text
+  context.fillStyle = 'rgba(255, 255, 255, 0.3)'; // Very light white
+  context.font = '80px Arial';
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(randomChar, size/2, size/2);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  return texture;
+};
+
+
 const createTextTexture = (text, width = 512, height = 512) => {
   const canvas = document.createElement('canvas');
   canvas.width = width;
@@ -60,48 +87,46 @@ class Cube {
   createCube() {
     const geometry = new THREE.BoxGeometry(0.97, 0.97, 0.97);
     const gap = 1.01;
-
+  
     for (let x = -1; x <= 1; x++) {
       for (let y = -1; y <= 1; y++) {
         for (let z = -1; z <= 1; z++) {
           const materials = [
-            new THREE.MeshPhongMaterial({ color: x === 1 ? 0xB90000 : 0x282828 }), // Right - Red
-            new THREE.MeshPhongMaterial({ color: x === -1 ? 0xFF6C00 : 0x282828 }), // Left - Orange
-            new THREE.MeshPhongMaterial({ color: y === 1 ? 0xFFFFFF : 0x282828 }), // Top - White
-            new THREE.MeshPhongMaterial({ color: y === -1 ? 0xFFD500 : 0x282828 }), // Bottom - Yellow
-            new THREE.MeshPhongMaterial({ color: z === 1 ? 0x009B48 : 0x282828 }), // Front - Green
-            new THREE.MeshPhongMaterial({ color: z === -1 ? 0x0045AD : 0x282828 })  // Back - Blue
-        ];
-        
+            
 
-        
-
+              new THREE.MeshPhongMaterial({ color: x === 1 ? 0xB90000 : 0xFFFFFF }), // Right - Red or White
+              new THREE.MeshPhongMaterial({ color: x === -1 ? 0xFF6C00 : 0xFFFFFF }), // Left - Orange or White
+              new THREE.MeshPhongMaterial({ color: y === 1 ? 0xFFFFFF : 0xFFFFFF }), // Top - White
+              new THREE.MeshPhongMaterial({ color: y === -1 ? 0xFFD500 : 0xFFFFFF }), // Bottom - Yellow or White
+              new THREE.MeshPhongMaterial({ color: z === 1 ? 0x009B48 : 0xFFFFFF }), // Front - Green or White
+              new THREE.MeshPhongMaterial({ color: z === -1 ? 0x0045AD : 0xFFFFFF })  // Back - Blue or White
+          
+          ];
+  
           const cubelet = new THREE.Mesh(geometry, materials);
           cubelet.position.set(x * gap, y * gap, z * gap);
-// Add text only to the center green cube (inside)
-// Add text only to the center cube and make it visible through the green face (z === 1)
-if (x === 0 && y === 0 && z === 0) { // Ensure this is the center cube
-  const secretText = "RR,RR\nRU,RL,RD"; // Secret sequence
-  const textTexture = createTextTexture(secretText);
-
-  const textGeometry = new THREE.PlaneGeometry(0.8, 0.8);
-  const textMaterial = new THREE.MeshBasicMaterial({ map: textTexture, transparent: true });
-  const textPlane = new THREE.Mesh(textGeometry, textMaterial);
-
-  // Position the text slightly behind the green face (z === 1)
-  textPlane.position.set(0, 0, 0.48); // Adjust to align with the green face
-  textPlane.rotation.y = 0; // Ensure proper orientation for the green face
-
-  cubelet.add(textPlane); // Attach text to the center cube
-}
-
-
-          
+  
+          // Add text only to the center cube (inside)
+          if (x === 0 && y === 0 && z === 0) {
+            const secretText = "RR,RR\nRU,RL,RD";
+            const textTexture = createTextTexture(secretText);
+  
+            const textGeometry = new THREE.PlaneGeometry(0.8, 0.8);
+            const textMaterial = new THREE.MeshBasicMaterial({ map: textTexture, transparent: true });
+            const textPlane = new THREE.Mesh(textGeometry, textMaterial);
+  
+            // Position the text slightly behind the green face (z === 1)
+            textPlane.position.set(0, 0, 0.48);
+            textPlane.rotation.y = 0;
+  
+            cubelet.add(textPlane);
+          }
+  
           const edgesGeometry = new THREE.EdgesGeometry(geometry);
           const edgesMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
           const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
           cubelet.add(edges);
-
+  
           cubelet.userData.originalPosition = new THREE.Vector3(x, y, z);
           
           this.cubelets.push(cubelet);
@@ -109,24 +134,25 @@ if (x === 0 && y === 0 && z === 0) { // Ensure this is the center cube
         }
       }
     }
+    
     // Create a texture with the secret sequence
-const textTexture = createTextTexture(
-  'RR,RR\nRU,RL,RD'
-);
-
-// Create a plane geometry for the back wall
-const planeGeometry = new THREE.PlaneGeometry(1.5, 1.5); // Adjust size to fit back wall
-const planeMaterial = new THREE.MeshBasicMaterial({
-  map: textTexture,
-  transparent: true,
-});
-
-// Create the plane and position it
-const textPlane = new THREE.Mesh(planeGeometry, planeMaterial);
-textPlane.position.set(0, 0, -1.02); // Slightly in front of the back wall
-textPlane.rotation.y = Math.PI; // Face it towards the camera
-this.group.add(textPlane);
-
+    const textTexture = createTextTexture(
+      'RR,RR\nRU,RL,RD'
+    );
+  
+    // Create a plane geometry for the back wall
+    const planeGeometry = new THREE.PlaneGeometry(1.5, 1.5);
+    const planeMaterial = new THREE.MeshBasicMaterial({
+      map: textTexture,
+      transparent: true,
+    });
+  
+    // Create the plane and position it
+    const textPlane = new THREE.Mesh(planeGeometry, planeMaterial);
+    textPlane.position.set(0, 0, -1.02);
+    textPlane.rotation.y = Math.PI;
+    this.group.add(textPlane);
+  
     this.scene.add(this.group);
   }
 
@@ -286,11 +312,11 @@ const RubiksCube = () => {
 
   useEffect(() => {
     const mount = mountRef.current;
-
+  
     // Scene setup
     const scene = new THREE.Scene();
     scene.background = null;
-
+  
     // Camera setup
     const camera = new THREE.PerspectiveCamera(
       75,
@@ -298,55 +324,95 @@ const RubiksCube = () => {
       0.1,
       1000
     );
-    camera.position.set(4, 4, 4);
+    const isMobile = window.innerWidth < 768;
+    // Adjusted Y position to move cube up slightly
+    camera.position.set(isMobile ? 6 : 5, isMobile ? 7 : 6, isMobile ? 6 : 5);
     camera.lookAt(0, 0, 0);
-
+  
     // Renderer setup
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     mount.appendChild(renderer.domElement);
-
+  
     // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
     scene.add(ambientLight);
-
+  
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
     directionalLight.position.set(10, 10, 10);
     scene.add(directionalLight);
-
+  
     // Create cube
     const cube = new Cube(scene, camera);
-    
     cubeRef.current = cube;
-
+  
     // Orbit controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controlsRef.current = controls;
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-
-    // Add mouse/touch event handlers
+    controls.rotateSpeed = 0.7;
+    controls.touchRotateSpeed = 0.7;
+    controls.enablePan = false;
+  
+    // Event handlers
     const onMouseDown = (event) => {
       cube.handleMouseDown(event, renderer.domElement);
     };
-
+  
     const onMouseMove = (event) => {
       cube.handleMouseMove(event);
     };
-
+  
     const onMouseUp = () => {
       cube.handleMouseUp();
     };
-
+  
+    // Touch events
+    const onTouchStart = (event) => {
+      const touch = event.touches[0];
+      cube.handleMouseDown({
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      }, renderer.domElement);
+    };
+  
+    const onTouchMove = (event) => {
+      const touch = event.touches[0];
+      cube.handleMouseMove({
+        clientX: touch.clientX,
+        clientY: touch.clientY
+      });
+    };
+  
+    const onTouchEnd = () => {
+      cube.handleMouseUp();
+    };
+  
+    // Add event listeners
     mount.addEventListener("mousedown", onMouseDown);
     mount.addEventListener("mousemove", onMouseMove);
     mount.addEventListener("mouseup", onMouseUp);
     mount.addEventListener("mouseleave", onMouseUp);
-
+    mount.addEventListener("touchstart", onTouchStart);
+    mount.addEventListener("touchmove", onTouchMove);
+    mount.addEventListener("touchend", onTouchEnd);
+  
+    // Handle window resize
+    const handleResize = () => {
+      const isMobile = window.innerWidth < 768;
+      camera.position.set(isMobile ? 6 : 4, isMobile ? 6 : 4, isMobile ? 6 : 4);
+      camera.lookAt(0, 0, 0);
+      camera.aspect = mount.clientWidth / mount.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(mount.clientWidth, mount.clientHeight);
+    };
+    window.addEventListener("resize", handleResize);
+  
     // Add keyboard controls
     const handleKeyPress = (event) => {
       if (cube.isRotating) return;
-
+  
       const PI_2 = Math.PI / 2;
       switch (event.key.toLowerCase()) {
         case "r":
@@ -375,9 +441,8 @@ const RubiksCube = () => {
           break;
       }
     };
-
     window.addEventListener("keydown", handleKeyPress);
-
+  
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate);
@@ -385,15 +450,7 @@ const RubiksCube = () => {
       renderer.render(scene, camera);
     };
     animate();
-
-    // Handle window resize
-    const handleResize = () => {
-      camera.aspect = mount.clientWidth / mount.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(mount.clientWidth, mount.clientHeight);
-    };
-    window.addEventListener("resize", handleResize);
-
+  
     // Cleanup
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
@@ -402,63 +459,67 @@ const RubiksCube = () => {
       mount.removeEventListener("mousemove", onMouseMove);
       mount.removeEventListener("mouseup", onMouseUp);
       mount.removeEventListener("mouseleave", onMouseUp);
+      mount.removeEventListener("touchstart", onTouchStart);
+      mount.removeEventListener("touchmove", onTouchMove);
+      mount.removeEventListener("touchend", onTouchEnd);
       mount.removeChild(renderer.domElement);
     };
   }, []);
-
   return (
     <div className="relative w-full h-screen bg-black">
       {/* Matrix Background */}
       <MatrixBackground />
-
-      {/* Neon Header */}
-      <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-50 text-center">
-        <h1 className="font-mono text-5xl neon-text">Sutakku Records</h1>
+  
+      {/* Neon Header - Reduced size for mobile */}
+      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 z-50 text-center w-full px-4">
+        <h1 className="font-mono text-2xl sm:text-5xl neon-text">Sutakku Records</h1>
       </div>
-
-      {/* Three.js Mount Area */}
+  
+      {/* Three.js Mount Area - Added padding top to prevent overlap */}
       <div
-        ref={mountRef}
-        className="absolute inset-0 z-10"
-        style={{ pointerEvents: "auto" }}
-      />
-
-{/* Buttons */}
-<div
-  className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-50 flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 bg-black bg-opacity-80 p-4 rounded-lg shadow-lg w-full sm:w-auto"
-  style={{
-    pointerEvents: "auto",
-    zIndex: 1000,
-  }}
->
+      ref={mountRef}
+      className="absolute inset-0 z-10 transform -translate-y-12 sm:-translate-y-0"
+      style={{ pointerEvents: "auto" }}
+    />
+  
+     {/* Buttons - Updated for better desktop/mobile layout */}
+<div className="absolute bottom-0 left-0 w-full sm:bottom-10 z-50 flex flex-col sm:flex-row sm:justify-center gap-2 bg-black bg-opacity-80 p-4">
   <button
-    className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300 text-sm sm:text-base w-full sm:w-auto"
+    className="px-4 py-2 font-mono text-green-400 border border-green-400 rounded-lg 
+      hover:bg-green-800 hover:text-white transition-all duration-300 
+      text-sm w-full sm:w-48 mx-auto"  // Changed max-w to fixed w-48 on desktop
     onClick={() => rotateCube(new THREE.Vector3(1, 0, 0), 1, Math.PI / 2, "Rotate Right")}
   >
     Rotate Right
   </button>
   <button
-    className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300 text-sm sm:text-base w-full sm:w-auto"
+    className="px-4 py-2 font-mono text-green-400 border border-green-400 rounded-lg 
+      hover:bg-green-800 hover:text-white transition-all duration-300 
+      text-sm w-full sm:w-48 mx-auto"
     onClick={() => rotateCube(new THREE.Vector3(1, 0, 0), -1, -Math.PI / 2, "Rotate Left")}
   >
     Rotate Left
   </button>
   <button
-    className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300 text-sm sm:text-base w-full sm:w-auto"
+    className="px-4 py-2 font-mono text-green-400 border border-green-400 rounded-lg 
+      hover:bg-green-800 hover:text-white transition-all duration-300 
+      text-sm w-full sm:w-48 mx-auto"
     onClick={() => rotateCube(new THREE.Vector3(0, 1, 0), 1, Math.PI / 2, "Rotate Up")}
   >
     Rotate Up
   </button>
   <button
-    className="px-6 py-3 font-mono text-green-400 border border-green-400 rounded-lg hover:bg-green-800 hover:text-white transition-all duration-300 text-sm sm:text-base w-full sm:w-auto"
+    className="px-4 py-2 font-mono text-green-400 border border-green-400 rounded-lg 
+      hover:bg-green-800 hover:text-white transition-all duration-300 
+      text-sm w-full sm:w-48 mx-auto"
     onClick={() => rotateCube(new THREE.Vector3(0, 1, 0), -1, -Math.PI / 2, "Rotate Down")}
   >
     Rotate Down
   </button>
 </div>
-
     </div>
   );
+  
 };
 
 export default RubiksCube;
