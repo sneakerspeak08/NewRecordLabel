@@ -1,11 +1,14 @@
 {
     "builds": [
       {
-        "src": "package.json",
-        "use": "@vercel/node",
-        "config": {
-          "buildCommand": "vite build"
-        }
+        "src": "src/**/*",
+        "use": "@vercel/static"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/src/index.html"
       }
     ]
   }
